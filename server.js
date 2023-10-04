@@ -1,16 +1,48 @@
+// dotenv
+require("dotenv").config();
 const express = require("express"); /// express variable and require express package from express
-
 const app = express();
+const cors = require('cors')
 
-// acces  through web browser
-// app.get(url,callbackFunction) // callbackFunction two parameters request response
-// request is what client sent to the server 
-// response is what the server response back to the client 
-app.get("", (req,res) => {
-    res.send(`<h1>hello client</h1> `); // send to the client 
-});
+const domain=process.env.domain;
+ var corsOptions = {
+   origin: domain, // only this domain acces  rest  api 
+   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+ }
+app.use(cors(corsOptions));
+// Using Node.js `require()`
+const mongoose = require("mongoose");
 
-app.listen("3000", () => {
-  // listen to port 3000
-  console.log("node api"); // what will listen to
-});
+// routes
+const ProductRouter = require("./routes/productroute");
+
+//
+const errorMiddleware=require("./middleware/errorMiddleware");
+
+
+
+// middleware so our app can undarstand json
+app.use(express.json());
+//
+app.use(express.urlencoded({extended:false}));
+
+//routes
+app.use("/api/product", ProductRouter);
+// 
+app.use(errorMiddleware);
+
+// env
+const Mongodb_URL = process.env.Mongodb_URL;
+const port = process.env.Port || 3000;
+
+//connect mongodb
+mongoose
+  .connect(`${Mongodb_URL}`)
+  .then(() => {
+    console.log("connected");
+    app.listen(port, () => {
+      // listen to port 3000
+      console.log("node api"); // what will listen to
+    });
+  })
+  .catch((error) => console.log(error));

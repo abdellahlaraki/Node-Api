@@ -1,0 +1,4 @@
+NODE_ENV=development
+Mongodb_URL=mongodb_url
+Port=3000
+domain=http://example_domain:3000
